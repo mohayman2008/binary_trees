@@ -54,7 +54,7 @@ void binary_tree_levelorder(const binary_tree_t *tree, void (*func)(int))
 	nodes_list = malloc(sizeof(*nodes_list) * 2);
 	if (!nodes_list)
 		return;
-	nodes_list[0] = (binary_tree_t *) (long long int) tree;
+	nodes_list[0] = (binary_tree_t *) (long int) tree;
 	nodes_list[1] = NULL;
 
 	while (*nodes_list)

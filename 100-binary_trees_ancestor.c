@@ -16,8 +16,8 @@ binary_tree_t *binary_trees_ancestor(const binary_tree_t *first,
 	if (!first || !second)
 		return (NULL);
 
-	itr1 = (binary_tree_t *) ((long long int) first);
-	second_n = (binary_tree_t *) ((long long int) second);
+	itr1 = (binary_tree_t *) ((long int) first);
+	second_n = (binary_tree_t *) ((long int) second);
 
 	while (itr1)
 	{
