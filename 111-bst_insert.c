@@ -37,7 +37,7 @@ bst_t *bst_find(bst_t *tree, int value)
  */
 bst_t *bst_insert(bst_t **tree, int value)
 {
-	bst_t *new, *parent/* , *child */;
+	bst_t *new, *parent;
 
 	if (!tree)
 		return (0);
