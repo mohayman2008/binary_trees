@@ -58,7 +58,7 @@ void balance_avl_up(avl_t **tree, avl_t *node)
 
 	if (!parent->parent)
 		*tree = parent;
-	
+
 	balance_avl_up(tree, parent);
 }
 
