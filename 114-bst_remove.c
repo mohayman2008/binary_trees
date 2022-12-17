@@ -1,128 +1,75 @@
 #include "binary_trees.h"
 
 /**
- * r_case - removes a node from a Binary Search Tree for node->right case
- * @root: tree root
- * @node: node to delete
- * Return: pointer the tree root
- */
-bst_t *r_case(bst_t *node, bst_t *root)
-{
-	node->right->left = node->left;
-	node->right->parent = node->parent;
-	if (node->parent)
-	{
-		if (node == node->parent->left)
-			node->parent->left = node->right;
-		if (node == node->parent->right)
-			node->parent->right = node->right;
-	}
-	if (node->left)
-		node->left->parent = node->right;
-	if (root == node)
-		root = node->right;
-	free(node);
-	return (root);
-}
-
-/**
- * r_l_case - removes a node from a Binary Search Tree for node->right->l case
- * @root: tree root
- * @node: node to delete
- * Return: pointer the tree root
- */
-bst_t *r_l_case(bst_t *node, bst_t *root)
-{
-	node->right->left->right = node->right;
-	node->right->left->parent = node->parent;
-	node->right->left->left = node->left;
-	if (node->left)
-		node->left->parent = node->right->left;
-	node->right->parent = node->right->left;
-	if (root == node)
-		root = node->right->left;
-	else
-	{
-		if (node == node->parent->left)
-			node->parent->left = node->right->left;
-		if (node == node->parent->right)
-			node->parent->right = node->right->left;
-	}
-	node->right->left = NULL;
-	free(node);
-	return (root);
-}
-
-/**
- * binary_tree_is_leaf - checks if a node is a leaf
+ * bst_search2 - Search for a value in a binary search tree
+ * @tree: Pointer to the root of the tree
+ * @value: The value to be found
  *
- * @node: pointer to the node to check
- * Return: 1 if node is a leaf, otherwise 0
+ * Return: The node with the value if found or the parent node to where
+ *		it should be inserted or (NULL) if tree is NULL
  */
-int binary_tree_is_leaf(const binary_tree_t *node)
+bst_t *bst_search2(const bst_t *tree, int value)
 {
-	int leaf = 0;
+	bst_t *t = (bst_t *) (long int) tree;
 
-	if (node && !(node->left) && !(node->right))
-		leaf = 1;
+	if (!t)
+		return (NULL);
 
-	return (leaf);
+	if (t->n == value)
+		return (t);
+
+	if (t->n > value)
+		return (bst_search2(t->left, value));
+	return (bst_search2(t->right, value));
 }
 
 /**
- * bst_search - searches for a value in a Binary Search Tree
+ * bst_remove - Removes a node from a binary search tree
+ * @root: Pointer to the root of the tree
+ * @value: The value to remove its corresponding node
  *
- * @tree: tree root
- * @value: node value
- * Return: pointer the found node
- */
-bst_t *bst_search(const bst_t *tree, int value)
-{
-	if (tree && value < tree->n)
-		return (bst_search(tree->left, value));
-
-	if (tree && value > tree->n)
-		return (bst_search(tree->right, value));
-
-	return ((bst_t *)tree);
-}
-
-/**
- * bst_remove - removes a node from a Binary Search Tree
- * @root: tree root
- * @value: node value
- * Return: pointer the tree root
+ * Return: The root node or (NULL) if tree is NULL
  */
 bst_t *bst_remove(bst_t *root, int value)
 {
-	bst_t *node;
+	bst_t *node, *successor, *new_root = root;
 
-	node = bst_search(root, value);
+	if (!root)
+		return (NULL);
 
-	if (node != NULL)
-	{
-		if (binary_tree_is_leaf(node) == 1)
+	node = bst_search2(root, value);
+	if (!node)
+		return (root);
+	if (!node->right)
+		successor = node->left;
+	else if (!node->left)
+		successor = node->right;
+	else
+	{/* Find the smallest node in the right tree */
+		successor = node->right;
+		while (successor->left)
+			successor = successor->left;
+		if (successor != node->right)
 		{
-			if (node == node->parent->left)
-				node->parent->left = NULL;
-			if (node == node->parent->right)
-				node->parent->right = NULL;
-			free(node);
-			return (root);
+			successor->parent->left = successor->right;
+			if (successor->right)
+				successor->right->parent = successor->parent;
+			node->right->parent = successor;
+			successor->right = node->right;
 		}
-		if (node->right && node->right->left)
-			root = r_l_case(node, root);
-		else if (node->right)
-			root = r_case(node, root);
-		else
-		{
-			if (node->parent)
-				node->parent->right = node->left;
-			node->left->parent = node->parent;
-			if (root == node)
-				root = node->left;
-			free(node);
-		}
+		successor->left = node->left,
+		node->left->parent = successor;
 	}
-	return (root);
+
+	if (successor)
+		successor->parent = node->parent;
+	if (!node->parent)
+		new_root = successor;
+	else if (node->parent->right == node)
+		node->parent->right = successor;
+	else
+		node->parent->left = successor;
+
+	free(node);
+	return (new_root);
 }
