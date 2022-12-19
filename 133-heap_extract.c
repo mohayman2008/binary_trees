@@ -152,6 +152,8 @@ int heap_extract(heap_t **root)
 		tree->parent->left = NULL;
 	else if (tree->parent)
 		tree->parent->right = NULL;
+	else
+		*root = NULL;
 
 	heapify_down(root);
 	free(tree);
